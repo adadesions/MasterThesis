@@ -32,6 +32,7 @@ class AdaImg:
     def show(self):
         cv2.waitKey()
 
+
     def set_imgPath(self, img_path):
         self.img_path = img_path
 
@@ -62,7 +63,7 @@ class AdaImg:
                 break
 
             self.lowerRes_imgs.append(temp)
-        
+
         print("=== Done PyramidDown, len: {} ===".format(len(self.lowerRes_imgs)))
 
 
@@ -81,6 +82,7 @@ class AdaImg:
             winNameIdx = "-".join([winName, str(idx)])
             cv2.imshow(winNameIdx, lowImg)
 
+
     def setGaborKernel(self):
         self.gabor_kernel = cv2.getGaborKernel(**self.gaborParams)
 
@@ -97,9 +99,12 @@ class AdaImg:
         self.gaborParams = newParams
 
 
-    def showGaborKernel(self, scale):
-        h, w = self.gabor_kernel.shape[:2]
-        scaledKernel = cv2.resize(self.gabor_kernel, (scale*w, scale*h), interpolation=cv2.INTER_CUBIC)
+    def showGaborKernel(self, scale, kernel=None):
+        if kernel is None:
+            kernel = self.gabor_kernel
+        
+        h, w = kernel.shape[:2]
+        scaledKernel = cv2.resize(kernel, (scale*w, scale*h), interpolation=cv2.INTER_CUBIC)
         cv2.imshow("Gabor Kernel", scaledKernel)
 
 
@@ -110,5 +115,25 @@ class AdaImg:
 
         cv2.imshow('img_gray', self.img_gray)
         cv2.imshow('img_filtered', img_filtered)
+        # fig = px.imshow(img_filtered, color_continuous_scale='gray')
+        # fig.show()
 
+
+# GaborFusion kernel
+    def getGaborFusion(self, originTheta=0, shift=np.pi/3):
+        varParams = self.gaborParams
+        varParams['theta'] = originTheta
+        winName = "Gabor-Prefusion"
+        gaborFusion = cv2.getGaborKernel(**varParams)
+
+        while varParams['theta'] < np.pi*2:
+            varParams['theta'] += shift
+            varKernel = cv2.getGaborKernel(**varParams)
+            gaborFusion = cv2.add(gaborFusion, varKernel)
+
+            winNameIdx = "-".join([winName, str(varParams['theta'])])
+            cv2.imshow(winNameIdx, varKernel)
+
+        self.gabor_kernel = gaborFusion
+        self.showGaborKernel(scale=10, kernel=self.gabor_kernel)
 

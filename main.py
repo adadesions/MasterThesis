@@ -14,23 +14,19 @@ ada.lowerResInfo()
 # ada.imShowLowerRes()
 
 # Gabor function and get response from any parametize
-ada.getGaborResponse()
-# Show Gabor Kernel
-ada.showGaborKernel(scale=3)
-
 # Set new gabor params
 newGaborParams = {
-    'ksize': (4, 4),
-    'sigma': 3.0,
+    'ksize': (64, 64),
+    'sigma': 5.0,
     'theta': np.pi/4,
-    'lambd': np.pi/4,
-    'gamma': 0,
+    'lambd': np.pi,
+    'gamma': 1,
     'psi': 0,
     'ktype': cv2.CV_32F
 }
 ada.setGaborParams(newGaborParams)
+ada.getGaborFusion()
 ada.getGaborResponse()
-ada.showGaborKernel(scale=10)
 
 # TODO: Hilbert Curve Transform
 # TODO: Classification by ML
